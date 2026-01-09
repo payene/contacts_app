@@ -5,8 +5,18 @@ namespace App\Entity;
 use App\Repository\ContactRepository;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
+use App\State\ContactOwnerProcessor;
 
-#[ApiResource] // <-- Ajoutez cette ligne
+use DateTimeImmutable;
+
+#[ApiResource(
+    operations: [
+        new Post(
+            processor: ContactOwnerProcessor::class
+        )
+    ]
+)]
 
 #[ORM\Entity(repositoryClass: ContactRepository::class)]
 class Contact
@@ -34,9 +44,23 @@ class Contact
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\ManyToOne(inversedBy: 'contactsList', targetEntity: User::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(nullable: false)]
+
+    #[ORM\JoinColumn(nullable: false)]
+    private ?user $owner = null;
+
+    #[ORM\Column]
+    private ?bool $delete = null;
+
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function __construct(){
+            $this->createdAt = new \DateTimeImmutable();
+            $this->delete = false;
     }
 
     public function getFirstName(): ?string
@@ -107,6 +131,30 @@ class Contact
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getOwner(): ?user
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?user $owner): static
+    {
+        $this->owner = $owner;
+
+        return $this;
+    }
+
+    public function isDelete(): ?bool
+    {
+        return $this->delete;
+    }
+
+    public function setDelete(bool $delete): static
+    {
+        $this->delete = $delete;
 
         return $this;
     }

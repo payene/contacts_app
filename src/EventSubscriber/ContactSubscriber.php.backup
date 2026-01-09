@@ -1,0 +1,21 @@
+<?php
+
+namespace App\EventSubscriber;
+
+use Doctrine\ORM\Events;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class ContactSubscriber implements EventSubscriberInterface
+{
+    public function onEvents(Events $event): void
+    {
+        // ...
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            Events::class => 'onEvents',
+        ];
+    }
+}
